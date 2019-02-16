@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<!-- 
+/**
+ * @category   Sh
+ * @package    Sh_Partnerinc
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+ -->
+<config>
+    <modules>
+        <Sh_Partnerinc>
+            <version>1.0.0</version>
+        </Sh_Partnerinc>
+    </modules>
+    <frontend>
+        <events>
+            <controller_action_predispatch>
+                <observers>
+                    <partinc_checkpartenr>
+                        <type>model</type>
+                        <class>partnerinc/observer</class>
+                        <method>checkPartner</method>
+                    </partinc_checkpartenr>
+                </observers>
+            </controller_action_predispatch>
+        </events>
+    </frontend>
+    <global>
+        <models>
+            <partnerinc>
+                <class>Sh_Partnerinc_Model</class>
+                <resourceModel>partnerinc_mysql4</resourceModel>
+            </partnerinc>
+            <partnerinc_mysql4>
+                <class>Sh_Partnerinc_Model_Mysql4</class>
+                <entities>
+                    <partnerinc>
+                        <table>partnerinc</table>
+                    </partnerinc>
+                </entities>
+            </partnerinc_mysql4>
+        </models>
+        <resources>
+            <partnerinc_setup>
+                <setup>
+                    <module>Sh_Partnerinc</module>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </partnerinc_setup>
+            <partnerinc_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </partnerinc_write>
+            <partnerinc_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </partnerinc_read>
+        </resources>
+        <helpers>
+            <partnerinc>
+                <class>Sh_Partnerinc_Helper</class>
+            </partnerinc>
+        </helpers>
+    </global>
+</config>
