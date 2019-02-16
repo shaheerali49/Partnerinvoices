@@ -25,6 +25,26 @@
             </controller_action_predispatch>
         </events>
     </frontend>
+    <adminhtml>
+        <events>
+            <core_layout_block_create_after>
+                <observers>
+                    <partner_ordergrid_add_columns>
+                        <class>partnerinc/observer</class>
+                        <method>addPartnerColumnToGrid</method>
+                    </partner_ordergrid_add_columns>
+                </observers>
+            </core_layout_block_create_after>
+            <sales_order_grid_collection_load_before>
+                <observers>
+                    <partner_sales_order_grid_collection>
+                        <class>partnerinc/observer</class>
+                        <method>salesOrderGridCollectionLoadBefore</method>
+                    </partner_sales_order_grid_collection>
+                </observers>
+            </sales_order_grid_collection_load_before>
+        </events>
+    </adminhtml>
     <global>
         <models>
             <partnerinc>
@@ -65,5 +85,16 @@
                 <class>Sh_Partnerinc_Helper</class>
             </partnerinc>
         </helpers>
+        <events>
+            <sales_order_place_after>
+                <observers>
+                    <partnerinc_save_order>
+                        <type>model</type>
+                        <class>partnerinc/observer</class>
+                        <method>savePartnerToOrder</method>
+                    </partnerinc_save_order>
+                </observers>
+            </sales_order_place_after>
+        </events>
     </global>
 </config>
