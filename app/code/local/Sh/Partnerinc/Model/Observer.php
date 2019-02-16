@@ -76,6 +76,7 @@ class Sh_Partnerinc_Model_Observer
                 $order = $observer->getEvent()->getOrder();
                 $order->setData('partner', $partner);
                 $order->getResource()->saveAttribute($order, 'partner');
+                Mage::getModel('partnerinc/partnerinc')->invoiceSplit($order);
                 Mage::getModel('core/cookie')->delete($cookieName);
             }
 
