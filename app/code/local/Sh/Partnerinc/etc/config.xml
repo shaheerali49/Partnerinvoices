@@ -51,35 +51,12 @@
                 <class>Sh_Partnerinc_Model</class>
                 <resourceModel>partnerinc_mysql4</resourceModel>
             </partnerinc>
-            <partnerinc_mysql4>
-                <class>Sh_Partnerinc_Model_Mysql4</class>
-                <entities>
-                    <partnerinc>
-                        <table>partnerinc</table>
-                    </partnerinc>
-                </entities>
-            </partnerinc_mysql4>
+            <sales>
+                <rewrite>
+                    <order_payment>Sh_Partnerinc_Model_Sales_Order_Payment</order_payment>
+                </rewrite>
+            </sales>
         </models>
-        <resources>
-            <partnerinc_setup>
-                <setup>
-                    <module>Sh_Partnerinc</module>
-                </setup>
-                <connection>
-                    <use>core_setup</use>
-                </connection>
-            </partnerinc_setup>
-            <partnerinc_write>
-                <connection>
-                    <use>core_write</use>
-                </connection>
-            </partnerinc_write>
-            <partnerinc_read>
-                <connection>
-                    <use>core_read</use>
-                </connection>
-            </partnerinc_read>
-        </resources>
         <helpers>
             <partnerinc>
                 <class>Sh_Partnerinc_Helper</class>
