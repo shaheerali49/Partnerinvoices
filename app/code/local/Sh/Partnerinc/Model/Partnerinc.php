@@ -18,56 +18,60 @@ class Sh_Partnerinc_Model_Partnerinc extends Mage_Core_Model_Abstract
             {
                 return;
             }
-            $firstInvoice = array();
-            $secondInvoice = array();
-            foreach ($order->getAllVisibleItems() as $item) {
+            $firstInvoiceItems = array();
+            $secondInvoiceItems = array();
+            foreach ($order->getAllVisibleItems() as $orderItem) {
+                $item = Mage::getModel('sales/convert_order')->itemToInvoiceItem($orderItem);
                 if ($counter <= $firstHalf) {
-                    $firstInvoice[$item->getId()] = $item->getQtyOrdered();
+                    $firstInvoiceItems[$item->getOrderItemId()] = $orderItem->getQtyOrdered();
+                    $secondInvoiceItems[$item->getOrderItemId()] = 0;
                 }
                 elseif ($counter>$firstHalf)
                 {
-                    $secondInvoice[$item->getId()] = $item->getQtyOrdered();
+                    $secondInvoiceItems[$item->getOrderItemId()] = $orderItem->getQtyOrdered();
+                    $firstInvoiceItems[$item->getOrderItemId()] = 0;
                 }
 
                 $counter++;
             }
 
-            //echo "<pre>";
-            //print_r($firstInvoice);
-            //print_r($secondInvoice);
-
-            //exit;
-
-
-            if (count($firstInvoice)>0) {
-                $invoice = Mage::getModel('sales/service_order', $order)->prepareInvoice($firstInvoice);
-                $this->invoiceSplitExecute($invoice);
+            
+            try {
+                $firstInvoice = Mage::getModel('sales/service_order', $order)->prepareInvoice($firstInvoiceItems);
+                $firstInvoice->register();
+                $firstInvoice->setEmailSent(true);
+                $firstInvoice->getOrder()->setCustomerNoteNotify(true);
+                $transactionSave = Mage::getModel('core/resource_transaction')
+                    ->addObject($firstInvoice)
+                    ->addObject($order)
+                    ->save();
+            } catch(Exception $e) {
+                die($e->getMessage());
             }
 
-            if (count($secondInvoice)>0) {
-                $invoice = Mage::getModel('sales/service_order', $order)->prepareInvoice($secondInvoice);
-                $this->invoiceSplitExecute($invoice);
+            $firstInvoice->clearInstance();
+
+            try {
+                $secondInvoice = Mage::getModel('sales/service_order', $order)->prepareInvoice($secondInvoiceItems);
+                $secondInvoice->register();
+                $secondInvoice->setEmailSent(true);
+                $secondInvoice->getOrder()->setCustomerNoteNotify(true);
+
+                $transactionSave = Mage::getModel('core/resource_transaction')
+                    ->addObject($secondInvoice)
+                    ->addObject($order)
+                    ->save();
+            } catch(Exception $e) {
+                die($e->getMessage());
             }
 
+
+            $secondInvoice->clearInstance();
         } else{
             Mage::log('Cannot create an invoice for order ' . $order->getIncrementId(), null, 'partnerinc.log', true);
         }
     }
 
-    public function invoiceSplitExecute($invoice)
-    {
-        if ($invoice) {
 
-            $invoice->getOrder()->setIsInProcess(true);
-
-            $invoice->register();
-            $transactionSave = Mage::getModel('core/resource_transaction')
-                ->addObject($invoice)
-                ->addObject($invoice->getOrder());
-            $transactionSave->save();
-            $invoice->getOrder()->setState(Mage_Sales_Model_Order::STATE_PROCESSING, true)->save();
-
-        }
-    }
 
 }
