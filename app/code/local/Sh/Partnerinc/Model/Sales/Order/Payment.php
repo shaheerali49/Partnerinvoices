@@ -11,8 +11,15 @@ class Sh_Partnerinc_Model_Sales_Order_Payment extends Mage_Sales_Model_Order_Pay
      */
     public function place()
     {
-        Mage::dispatchEvent('sales_order_payment_place_start', array('payment' => $this));
         $order = $this->getOrder();
+        if($order->getData("partner")==NULL || $order->getData("partner")=="")
+        {
+            parent::place();
+            return;
+
+        }
+        Mage::dispatchEvent('sales_order_payment_place_start', array('payment' => $this));
+
 
         $this->setAmountOrdered($order->getTotalDue());
         $this->setBaseAmountOrdered($order->getBaseTotalDue());
@@ -111,8 +118,15 @@ class Sh_Partnerinc_Model_Sales_Order_Payment extends Mage_Sales_Model_Order_Pay
     public function capture($invoice)
     {
 
-        $invoice = null;
         $order = $this->getOrder();
+        if($order->getData("partner")==NULL || $order->getData("partner")=="")
+        {
+            parent::capture($invoice);
+            return;
+
+        }
+
+        $invoice = null;
 
         $amountToCapture = $this->_formatAmount($order->getBaseGrandTotal());
 
@@ -178,12 +192,20 @@ class Sh_Partnerinc_Model_Sales_Order_Payment extends Mage_Sales_Model_Order_Pay
      */
     public function registerCaptureNotification($amount, $skipFraudDetection = false)
     {
+        $order = $this->getOrder();
+
+        if($order->getData("partner")==NULL || $order->getData("partner")=="")
+        {
+            parent::registerCaptureNotification($amount, $skipFraudDetection = false);
+            return;
+
+        }
 
         $this->_generateTransactionId(Mage_Sales_Model_Order_Payment_Transaction::TYPE_CAPTURE,
             $this->getAuthorizationTransaction()
         );
 
-        $order = $this->getOrder();
+
         $amount = (float)$amount;
         $invoice = null;
 
